@@ -13,6 +13,8 @@ namespace RoRSkinBuilder.Data
         private static readonly Dictionary<string, string> shaderPaths = new Dictionary<string, string>()
         {
             ["Fake RoR/Hopoo Games/Deferred/Standard"] = "RoR2/Base/Shaders/HGStandard.shader",
+            ["Fake RoR/Hopoo Games/Deferred/HGCloudRemap"] = "RoR2/Base/Shaders/HGCloudRemap.shader",
+            ["Fake RoR/Hopoo Games/Deferred/HGOpaqueCloudRemap"] = "RoR2/Base/Shaders/HGOpaqueCloudRemap.shader",
         };
 
         private readonly SkinModInfo skinModInfo;
@@ -127,7 +129,20 @@ namespace RoRSkinBuilder.Data
                     }
                 }
             }
-
+            // Addition to Swap Materials in Additional Resource
+            foreach (var resource in skinModInfo.additionalResources)
+            {
+                if (resource == null) continue;
+                if (resource is Material m)
+                {
+                    materialPaths[m] = AssetDatabase.GetAssetPath(m);
+                    if (shaderPaths.TryGetValue(m.shader.name, out var shaderPath))
+                    {
+                        materialsWithRoRShader.GetOrAdd(shaderPath, () => new HashSet<Material>()).Add(m);
+                    }
+                }
+            }
+            //
             var tmpMeshesFolder = Path.Combine(modFolder, "Meshes");
             if (Directory.Exists(tmpMeshesFolder))
             {
