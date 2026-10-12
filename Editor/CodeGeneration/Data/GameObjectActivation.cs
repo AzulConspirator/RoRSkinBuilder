@@ -12,6 +12,8 @@ namespace RoRSkinBuilder.Data
         public string rendererName;
         [ShowWhen(nameof(accessType), false, GameObjectActivationAccessType.ByPath)]
         public string path;
+        [ShowWhen(nameof(accessType), false, GameObjectActivationAccessType.ByTarget)]
+        public string targetName;
         public bool spawnPrefabOnModelObject;
         [ShowWhen(nameof(spawnPrefabOnModelObject), false, false)]
         public bool shouldActivate;

@@ -305,7 +305,15 @@ foreach (var skin in ReorderedSkins) {
             this.Write("\\\"\", mdl.transform.Find(\"");
             this.Write(this.ToStringHelper.ToStringWithCulture(activation.path));
             this.Write("\")).gameObject,\r\n");
- } 
+ }else if (activation.accessType == GameObjectActivationAccessType.ByTarget) { 
+            this.Write("                            gameObject = ThrowIfNull(");
+            this.Write(this.ToStringHelper.ToStringWithCulture(i));
+            this.Write(", \"There is no renderer at path \\\"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(activation.targetName));
+            this.Write("\\\"\", GetChildGameObject(mdl, \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(activation.targetName));
+            this.Write("\")).gameObject,\r\n");
+ }  
  if (activation.spawnPrefabOnModelObject) { 
             this.Write("                            shouldActivate = false,\r\n                            " +
                     "spawnPrefabOnModelObject = true,\r\n                            localPosition = ");
@@ -593,7 +601,7 @@ if (replacement.rendererReference.accessType == ComponentAccessType.ByName) {
         }
 ");
  } 
-            this.Write("\r\n        private static T ThrowIfEquals<T>(int index, string message, T value, T" +
+                this.Write("\r\n        private static T ThrowIfEquals<T>(int index, string message, T value, T" +
                     " expected) where T: Enum\r\n        {\r\n            if (value.Equals(expected))\r\n  " +
                     "          {\r\n                throw new ElementException(index, message);\r\n      " +
                     "      }\r\n\r\n            return value;\r\n        }\r\n        \r\n        private stati" +
@@ -616,7 +624,21 @@ if (replacement.rendererReference.accessType == ComponentAccessType.ByName) {
                     "ception) { }\r\n        }\r\n\r\n        private class ElementException : Exception\r\n " +
                     "       {\r\n            public int Index { get; }\r\n            public ElementExcep" +
                     "tion(int index, string message) : base(message)\r\n            {\r\n                " +
-                    "Index = index;\r\n            }\r\n        }\r\n    }\r\n}");
+                    "Index = index;\r\n            }\r\n        }\r\n");
+
+                        this.Write("\r\n        private static GameObject GetChildGameObject(GameObject fromGameObject," + " string withName)\r\n " +
+                "{\r\n" +
+                    "var allKids = fromGameObject.GetComponentsInChildren<Transform>();\r\n " +
+                    "foreach (Transform child in allKids)\r\n " +
+                    "{\r\n " +
+                        "if (child.name.StartsWith(withName))\r\n " +
+                        "{\r\n " +
+                            "return child.gameObject;\r\n " +
+                        "}\r\n " +
+                    "}\r\n " +
+                    "return null;\r\n " +
+                "}\r\n ");
+                        this.Write("    }\r\n}");       
             return this.GenerationEnvironment.ToString();
         }
     }
